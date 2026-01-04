@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #9face6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .weather-app {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .result {
+      margin-top: 20px;
+    }
+
+    .result img {
+      width: 64px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="weather-app">
+    <h2>🌤️ Weather App</h2>
+
+    <input type="text" id="locationInput" placeholder="Enter city name">
+    <br>
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div class="result" id="weatherResult"></div>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script>
+    const apiKey = "312f384b0f884369b99171455260301";
+
+    function getWeather() {
+      const location = document.getElementById("locationInput").value;
+      const resultDiv = document.getElementById("weatherResult");
+      const errorDiv = document.getElementById("errorMsg");
+
+      resultDiv.innerHTML = "";
+      errorDiv.innerHTML = "";
+
+      if (location === "") {
+        errorDiv.innerText = "Please enter a location";
+        return;
+      }
+
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            errorDiv.innerText = data.error.message;
+            return;
+          }
+
+          const weatherHTML = `
+            <h3>${data.location.name}, ${data.location.country}</h3>
+            <img src="${data.current.condition.icon}">
+            <p><b>${data.current.condition.text}</b></p>
+            <p>🌡️ Temperature: ${data.current.temp_c} °C</p>
+            <p>💧 Humidity: ${data.current.humidity}%</p>
+            <p>💨 Wind: ${data.current.wind_kph} km/h</p>
+            <p>🌫️ AQI (PM2.5): ${data.current.air_quality.pm2_5.toFixed(2)}</p>
+          `;
+
+          resultDiv.innerHTML = weatherHTML;
+        })
+        .catch(error => {
+          errorDiv.innerText = "Error fetching weather data";
+        });
+    }
+  </script>
+
+</body>
+</html>
